@@ -1,7 +1,13 @@
-## Set-up
+## Environment variables
 
-Host on Heroku with the following heroku config variables
+### PORT
+Not required. Default port is 5000.
 
-TZ=Europe/Oslo  
-TYPEFORM_ID=[Id of your typeform form]  
-TYPEFORM_KEY=[Your api key]
+### TZ
+Only required if hosting on Heroku
+
+### TYPEFORM_ID
+The id of the form
+
+### TYPEFORM_KEY
+The api key
