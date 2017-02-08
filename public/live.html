@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Oslo Fintech Fest</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+</head>
+<body>
+
+<div class="app">
+  <h1>Total Investment pledges so far</h1>
+  <p>Register your interest here: <a href="https://oslofintechfest.invesdor.com">oslofintechfest.invesdor.com</a></p>
+  <div class="startups">
+    <div class="startup" data-startup="BitSpace">
+      <h2>BitSpace</h2>
+      <div class="row" data-answer="Less than 50 000 kr">
+        <div class="amount">0k–50k</div>
+        <div class="count">0</div>
+      </div>
+      <div class="row" data-answer="50 000 - 100 000 kr">
+        <div class="amount">50k–100k</div>
+        <div class="count">0</div>
+      </div>
+      <div class="row" data-answer="100 000 - 250 000 kr">
+        <div class="amount">100k–250k</div>
+        <div class="count">0</div>
+      </div>
+      <div class="row" data-answer="250 000+">
+        <div class="amount">250k+</div>
+        <div class="count">0</div>
+      </div>
+    </div>
+    <div class="startup" data-startup="Soci80">
+      <h2>Soci80</h2>
+      <div class="row" data-answer="Less than 50 000 kr">
+        <div class="amount">0k–50k</div>
+        <div class="count">0</div>
+      </div>
+      <div class="row" data-answer="50 000 - 100 000 kr">
+        <div class="amount">50k–100k</div>
+        <div class="count">0</div>
+      </div>
+      <div class="row" data-answer="100 000 - 250 000 kr">
+        <div class="amount">100k–250k</div>
+        <div class="count">0</div>
+      </div>
+      <div class="row" data-answer="250 000+">
+        <div class="amount">250k+</div>
+        <div class="count">0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="last-data">
+</div>
+
+<style media="screen">
+  .last-data {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    font-size: 0.3rem;
+    color: white;
+  }
+  .app {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1rem;
+    margin: 0;
+    color: #263238;
+  }
+  p {
+    text-align: center;
+    font-size: 0.5rem;
+    margin: 0 0 0.75rem 0;
+    color: #263238;
+  }
+  p a {
+    color: #263238;
+    text-decoration: none;
+  }
+  h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+  }
+  .startups {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .startup {
+    margin: 0 1rem;
+    background: #455A64;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.2rem;
+    overflow: hidden;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;;
+    margin: 0.5rem 0;
+  }
+  .from:after {
+    content: "–"
+  }
+  .count {
+    margin-left: 1rem;
+  }
+
+  html {
+    background-color: #CFD8DC;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  @media screen and (min-height: 400px)
+  {
+    html {
+      font-size: 20px;
+    }
+  }
+
+  @media screen and (min-height: 500px)
+  {
+    html {
+      font-size: 30px;
+    }
+  }
+
+  @media screen and (min-height: 700px)
+  {
+    html {
+      font-size: 40px;
+    }
+  }
+
+  @media screen and (min-height: 900px)
+  {
+    html {
+      font-size: 60px;
+    }
+  }
+</style>
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"
+  integrity="sha256-Gn7MUQono8LUxTfRA0WZzJgTua52Udm1Ifrk5421zkA="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+  var lastDataReceived;
+  var lastDataEl;
+
+  $(function() {
+    lastDataEl = $(".last-data");
+    setInterval(reloadData, 5000);
+    setInterval(updateLastData, 1000);
+  })
+
+  function updateLastData() {
+    var now = moment();
+    var sinceLastData = now.diff(lastDataReceived, "seconds");
+    lastDataEl.text(sinceLastData);
+    if (!lastDataReceived) {
+      lastDataEl.text('-1');
+    }
+  }
+
+  function reloadData() {
+    $.get("/GetSummary", function(json) {
+      if (!json.startups) return;
+      lastDataReceived = moment(json.lastDataReceived);
+
+      $.each(json.startups, function(name, startup) {
+        updateStartup(startup, $("[data-startup='" + name + "']"));
+      });
+    });
+  }
+
+  function updateStartup(startup, startupEl) {
+    $.each(startup, function(answer, newCount) {
+      var countEl = startupEl.find("[data-answer='" + answer + "']").find(".count");
+      var oldCount = countEl.text();
+      countEl.text(newCount);
+      if (oldCount != newCount) {
+
+        window.requestAnimationFrame(function() {
+          countEl.css({
+            transform: 'scale(6)',
+            transition: 'none'
+          })
+          window.requestAnimationFrame(function() {
+            countEl.css({
+              transform: 'scale(1)',
+              transition: 'transform 0.5s'
+            })
+          })
+        });
+
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
